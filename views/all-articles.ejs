@@ -1,0 +1,22 @@
+<%- include('includes/head') %>
+
+<% data.forEach(article => { %>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title"><%= article.title %></h4>
+            <h6 class="card-subtitle mb-2 text-muted"><%= article.date %></h6>
+            <p class="card-text"><%= article.description %></p>
+            <% article.categories.forEach(category => { %>
+              <span class="badge badge-secondary"><a style="color: antiquewhite;" href="<%= `/articles/category/${category.title}` %>"><%= category.title %></a></span>
+          <% }) %> <br> <hr>
+            <a href="/articles/<%= article.path %>" class=" btn btn-primary card-link">Read More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% }) %>
+

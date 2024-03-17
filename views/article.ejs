@@ -1,0 +1,190 @@
+<%- include('includes/head') %>
+
+  <% articlePath=`articles/${article.path}` %>
+    <% categoryPath=`articles/category/${article.path}` %>
+
+      <body>
+
+        <div class="container mt-5">
+          <div class="row">
+
+            <div class="col-md-8 offset-md-2">
+              <h1 class="text-center">
+                <%= article.title %>
+              </h1>
+              <p class="text-center">
+                <%= article.date %>
+              </p>
+              <div class="container mt-5">
+                <h3>Tags:</h3>
+                <!-- Display tags using Bootstrap badges -->
+                <% category.forEach(element=> { %>
+                  <span class="badge badge-secondary"><a style="color: antiquewhite;"
+                      href="<%= `/articles/category/${element.title}` %>">
+                      <%= element.title %>
+                    </a></span>
+                  <% }) %>
+
+              </div>
+              <hr>
+              <div class="article-body">
+                <%- include(articlePath) %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container">
+
+
+
+
+          <h2>Comment Form</h2>
+          <form action="/articles/comment/<%= article.path %>" method="post">
+            <div class="form-group">
+              <label for="inputName">Name:</label>
+              <input type="text" class="form-control" id="inputName" placeholder="Enter your name" name="author">
+            </div>
+            <div class="form-group">
+              <label for="inputComment">Comment:</label>
+              <textarea name="content" class="form-control" id="inputComment" rows="5"
+                placeholder="Enter your comment"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+          </form>
+        </div>
+
+        <div class="container">
+          <h1 class="mt-5 mb-4">Comments</h1>
+
+          <% comments.forEach(comment=> { %>
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title mb-0">
+                  <%= comment.author %>
+                </h5>
+                <p class="card-text text-muted small mb-2">
+                  <%= comment.createdAt %>
+                </p>
+                <p class="card-text text-muted mt-2">
+                  <%= comment.content %>
+                </p>
+                <div hidden class="btn-group" role="group" aria-label="Vote buttons">
+                  <button type="button" class="btn btn-primary"
+                    onclick="vote('<%= comment._id %>', 'like')">Like</button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="vote('<%= comment._id %>', 'dislike')">Dislike</button>
+                </div>
+                <span hidden  id="comment-count" class="badge badge-primary vote-count">
+                  <%= comment.like-comment.dislike %>
+                </span> <!-- Display vote count -->
+              </div>
+            </div>
+            <% }) %>
+
+              <!-- Example comment block -->
+
+
+              <!-- You can repeat the above block for each comment -->
+
+        </div>
+
+
+        <script>
+          const names = [
+            'John', 'Jane', 'Michael', 'Emily', 'David', 'Emma', 'Andrew', 'Olivia', 'James', 'Sophia',
+            'William', 'Isabella', 'Joseph', 'Charlotte', 'Daniel', 'Amelia', 'Benjamin', 'Mia', 'Matthew', 'Harper',
+            'Ethan', 'Evelyn', 'Alexander', 'Abigail', 'Henry', 'Avery', 'Jacob', 'Grace', 'Samuel', 'Scarlett',
+            'Liam', 'Chloe', 'Noah', 'Madison', 'Logan', 'Elizabeth', 'Lucas', 'Ella', 'Jackson', 'Aria'
+          ];
+          const comments = [
+            "This is a great post!",
+            "I completely agree with you.",
+            "Interesting perspective.",
+            "I never thought about it that way before.",
+            "Thanks for sharing!",
+            "I'm not sure I understand.",
+            "Can you elaborate?",
+            "I'm not convinced.",
+            "I have a different opinion.",
+            "I disagree with you.",
+            "Wow, I didn't know that!",
+            "That's really insightful.",
+            "I'm learning so much from this discussion.",
+            "I appreciate your input.",
+            "I'm sorry, I don't follow.",
+            "Could you explain further?",
+            "This topic is fascinating.",
+            "I'm enjoying this conversation.",
+            "I'm not sure how I feel about this.",
+            "It's important to consider all perspectives.",
+            "I'm glad you brought this up.",
+            "I have a question.",
+            "What do you think about...?",
+            "I'm curious about...",
+            "This is getting off topic.",
+            "Let's stay focused.",
+            "I agree with your point.",
+            "I'm not sure I agree with that.",
+            "I need more information to form an opinion.",
+            "Let's agree to disagree.",
+            "I respect your viewpoint.",
+            "That's a valid point.",
+            "I never looked at it from that angle.",
+            "Let's explore this further.",
+            "I'm open to changing my mind.",
+            "I'm enjoying hearing different perspectives.",
+            "I'm feeling inspired by this discussion.",
+            "I'm feeling challenged by this topic.",
+            "Thanks for raising this issue.",
+          ];
+          const randomIndex = Math.floor(Math.random() * comments.length);
+          const randomComment = comments[randomIndex];
+          const randomName = names[randomIndex];
+          document.getElementById('inputName').value = randomName
+          document.getElementById('inputComment').value = randomComment
+
+
+          function vote(commentId, action) {
+            console.log(localStorage.getItem(`${commentId}_voted_up`))
+            console.log(localStorage.getItem(`${commentId}_voted_down`))
+
+            if (localStorage.getItem(`${commentId}_voted_up`) && action == 'like') {
+             console.log('voted up')
+              return '4'
+            }
+            if (localStorage.getItem(`${commentId}_voted_down`) && action == 'dislike') {
+              console.log('voted down')
+
+              return '()'
+            }
+
+            // Send POST request to server
+            fetch('/articles/vote', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ commentId, action })
+            })
+              .then(response => response.json())
+              .then(data => {
+                // Update vote count in UI
+                console.log(action)
+                if (action === 'like') {localStorage.setItem(`${commentId}_voted_up`, true);
+                localStorage.setItem(`${commentId}_voted_down`, false);              }
+                if (action === 'dislike'){ localStorage.setItem(`${commentId}_voted_down`, true);
+                localStorage.setItem(`${commentId}_voted_up`, false);
+              }
+
+              })
+              .catch(error => {
+                // Handle error
+              });
+          }
+
+        </script>
+
+
+      </body>
+
+      </html>

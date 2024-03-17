@@ -1,0 +1,40 @@
+<%- include('includes/head') %>
+<style>
+    img{
+        width: 30px;
+    }
+</style>
+
+
+<% data.forEach(article => { %>
+    <div class="container">
+        <div class="card mt-5">
+          <div class="card-body">
+            <h5 class="card-title">
+              <img src="/icons/article.png" alt="Article Icon" class="mr-2"> <%= article.title %>
+            </h5>
+            <p class="card-text">
+              <img src="/icons/date.png" alt="Date Icon" class="mr-2"> <strong>Date:</strong> <%= article.date %>
+            </p>
+            <p class="card-text">
+              <img src="/icons/visited.png" alt="Visits Icon" class="mr-2"> <strong>Visits:</strong> <%= article.visited %>
+            </p>
+            <p class="card-text">
+                <img src="/icons/comments.png" alt="Visits Icon" class="mr-2">
+                <strong>Comments:</strong>  <%= article.comments.length %></p>
+    
+            <!-- Delete form -->
+            <form action="/admin/<%= article._id %>/delete" method="POST">
+              <input type="hidden" name="articleId" value="articleId123">
+              <button type="submit" class="btn btn-secondary">
+                <img src="/icons/delete.png" alt="Delete Icon" class="mr-2"> Delete
+              </button>
+            </form>
+            <br>
+            <a href="/articles/<%= article._id %>/edit" class="btn btn-primary">Edit</a>
+
+          </div>
+        </div>
+      </div
+<% }) %>
+

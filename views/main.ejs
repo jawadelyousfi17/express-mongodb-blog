@@ -1,0 +1,112 @@
+<%- include('includes/head') %>
+
+
+  <!-- Include stylesheet -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.snow.css" rel="stylesheet" />
+
+
+  <!-- Responses handler -->
+  <div id="alert-div" class="container mt-5">
+    <!-- Success alert container -->
+    <div class="alert alert-success" id="successAlert">
+      <strong>Success!</strong> Your action was successful. <br> <a href="#" id="go-to-dashboard" class="alert-link">Go
+        to Dashboard</a>
+    </div>
+  </div>
+
+  <!-- errors -->
+  <div class="container mt-5">
+    <!-- Error alert container -->
+    <div class="alert alert-danger" id="errorAlert" style="display: none;">
+      <strong>Error!</strong> Something went wrong. Please try again.
+    </div>
+
+    <!-- Button to trigger the error alert -->
+  </div>
+
+
+  <!-- Create the editor container -->
+  <div class="container mt-5">
+    <form>
+      <div class="form-group">
+        <label for="titleInput">Title:</label>
+        <input type="text" class="form-control" id="titleInput" placeholder="Enter title">
+      </div>
+      <div class="form-group">
+        <label for="categoryInput">Category:</label>
+        <input type="text" class="form-control" id="categoryInput" placeholder="Enter category">
+      </div>
+
+      <button onClick="save(this)" type="button" class="btn btn-primary" id="submitButton">Submit</button>
+    </form>
+  </div>
+  <div class="container mt-5 custom-container">
+    <div id="editor">
+    </div>
+  </div>
+
+  <form id="myForm" action="/articles/new" method="post">
+    <input type="hidden" id="content">
+  </form>
+
+  <!-- Include the Quill library -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.js"></script>
+
+  <!-- Initialize Quill editor -->
+  <script>
+    const quill = new Quill('#editor', {
+      theme: 'snow'
+    });
+
+    // Or use editor.getContents() for Delta format
+
+    const alertDiv = document.getElementById('alert-div')
+    const alertLink = document.querySelector('.alert-link')
+    const errorAlert = document.getElementById('errorAlert');
+
+    alertDiv.style.display = 'none'
+    errorAlert.style.display = 'none'
+
+    const form = document.getElementById('myForm');
+
+    const save = async (b) => {
+      alertDiv.style.display = 'none'
+      errorAlert.style.display = 'none'
+      const title = document.getElementById('titleInput').value;
+      const category = document.getElementById('categoryInput').value;
+      const categories = category.split(',')
+        .map(element => element.trim());
+        console.log(categories)
+      // Get the content from Quill
+      const content = quill.root.innerHTML; // Or use editor.getContents() for Delta format
+
+      try {
+        b.innerHTML = 'loading ...'
+        const Response = await fetch('/articles/new', {
+          method: 'POST',
+          body: JSON.stringify({ content, title, category : categories }),
+          headers: { 'Content-Type': 'application/json' }
+        })
+        const response = await Response.json()
+        if (Response.ok) {
+          b.innerHTML = 'Submit'
+          alertDiv.style.display = ''
+          console.log(response.path)
+          alertLink.href = response.path
+        } else {
+          console.log('55', response)
+          errorAlert.style.display = 'block';
+          errorAlert.innerHTML = ` <strong>Error!</strong> ${response}`
+
+        }
+
+      } catch (error) {
+        console.log('55', error)
+        errorAlert.style.display = 'block';
+
+      }
+
+
+    }
+
+  </script>
