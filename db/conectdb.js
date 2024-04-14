@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const dburl = process.env.DB_URI || 'mongodb+srv://jawadpro17:Jawad.18@ecomerce-api-db.ayaobei.mongodb.net/blog?retryWrites=true&w=majority&appName=ecomerce-api-db' 
+const dburl = process.env.DB_URI 
 
 const conectDb = async (conected) => mongoose.connect(dburl).then(
     (result) => {
