@@ -78,6 +78,7 @@
         .map(element => element.trim());
         console.log(categories)
       // Get the content from Quill
+quill.root.innerHTML = Dummy.paragraph(5)
       const content = quill.root.innerHTML; // Or use editor.getContents() for Delta format
 
       try {
